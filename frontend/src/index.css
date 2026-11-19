@@ -8,17 +8,17 @@
   }
   
   body {
-    background-color: #FAF8FC;
-    color: #19151F;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #FAF6F0;
+    color: #1A1715;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
     overflow-x: hidden;
   }
 }
 
-/* Custom subtle scrollbar */
+/* Custom subtle warm scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -26,20 +26,10 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #E2DCED;
+  background: #E0D9CE;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #C4BDD3;
+  background: #CDC5B8;
 }
-
-/* Glass & Card effects */
-.coy-card-shadow {
-  box-shadow: 0 10px 30px -10px rgba(25, 21, 31, 0.08), 0 4px 12px -2px rgba(25, 21, 31, 0.04);
-}
-
-.coy-pink-glow {
-  box-shadow: 0 8px 24px -4px rgba(245, 54, 131, 0.4);
-}
-

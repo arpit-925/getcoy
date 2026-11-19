@@ -8,31 +8,30 @@ export default {
     extend: {
       colors: {
         coy: {
-          pink: '#F53683',
-          'pink-hover': '#E02674',
-          'pink-light': '#FFF0F5',
-          'pink-soft': '#FDE8EF',
-          bg: '#FAF8FC',
+          bg: '#FAF6F0',
+          ink: '#1A1715',
+          text: '#1A1715',
+          muted: '#7A726D',
+          accent: '#D6455D',
+          'accent-hover': '#BF374E',
+          'accent-soft': '#FBECEF',
+          border: '#E8E2D8',
           card: '#FFFFFF',
-          text: '#19151F',
-          muted: '#716B7B',
-          border: '#EDE8F2',
-          subtle: '#F3EFF8',
+          surface: '#F4EFE6',
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        display: ['Fraunces', 'Georgia', 'serif'],
+        sans: ['DM Sans', 'system-ui', '-apple-system', 'sans-serif'],
+      },
+      borderRadius: {
+        'card': '20px',
+        'chip': '8px',
       },
       boxShadow: {
-        'coy-card': '0 12px 35px -8px rgba(25, 21, 31, 0.08), 0 4px 12px -2px rgba(25, 21, 31, 0.04)',
-        'coy-pink': '0 10px 25px -5px rgba(245, 54, 131, 0.35)',
-        'coy-pass': '0 10px 25px -5px rgba(113, 107, 123, 0.25)',
+        'card-soft': '0 10px 30px -12px rgba(26, 23, 21, 0.08), 0 2px 6px -1px rgba(26, 23, 21, 0.04)',
       },
-      animation: {
-        'pulse-subtle': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-      }
     },
   },
   plugins: [],
 }
-

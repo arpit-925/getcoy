@@ -1,37 +1,29 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Flame, Compass, Heart, Sparkles } from 'lucide-react';
+import { Compass, Heart, Home } from 'lucide-react';
 import { DEMO_USER } from '../services/api';
 
 const Navbar = ({ matchesCount = 0 }) => {
   const location = useLocation();
 
   const navItems = [
-    { label: 'Home', path: '/', icon: Sparkles },
+    { label: 'Home', path: '/', icon: Home },
     { label: 'Discover', path: '/discover', icon: Compass },
     { label: 'Matches', path: '/matches', icon: Heart, badge: matchesCount },
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-md border-b border-coy-border">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        {/* Left: Coy Brand Logo */}
+    <header className="sticky top-0 z-40 w-full bg-[#FAF6F0]/95 backdrop-blur-xs border-b border-coy-border">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+        {/* Left: Coy Wordmark (Distinct Display Serif) */}
         <NavLink to="/discover" className="flex items-center gap-2 group">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-coy-pink to-rose-400 flex items-center justify-center text-white shadow-coy-pink group-hover:scale-105 transition-transform">
-            <Heart className="w-5 h-5 fill-current" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-2xl font-black tracking-tight text-coy-text group-hover:text-coy-pink transition-colors leading-none">
-              coy<span className="text-coy-pink">.</span>
-            </span>
-            <span className="text-[10px] font-semibold text-coy-muted tracking-wider uppercase">
-              Discover
-            </span>
-          </div>
+          <span className="font-display text-2xl font-semibold tracking-tight text-coy-ink">
+            coy<span className="text-coy-accent">.</span>
+          </span>
         </NavLink>
 
-        {/* Center: Desktop Navigation Tabs */}
-        <nav className="hidden md:flex items-center gap-1 bg-coy-bg p-1.5 rounded-full border border-coy-border">
+        {/* Center: Desktop Navigation Tabs (Flat, simple active state) */}
+        <nav className="hidden md:flex items-center gap-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
@@ -40,23 +32,17 @@ const Navbar = ({ matchesCount = 0 }) => {
               <NavLink
                 key={item.path}
                 to={item.path}
-                className={`relative flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs transition-colors ${
                   isActive
-                    ? 'text-white bg-coy-pink shadow-coy-pink font-semibold'
-                    : 'text-coy-muted hover:text-coy-text hover:bg-white/60'
+                    ? 'bg-coy-surface text-coy-ink font-medium border border-coy-border'
+                    : 'text-coy-muted hover:text-coy-ink'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'fill-current' : ''}`} />
+                <Icon className={`w-3.5 h-3.5 stroke-[1.75] ${isActive ? 'text-coy-accent' : ''}`} />
                 <span>{item.label}</span>
 
                 {item.badge > 0 && (
-                  <span
-                    className={`ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                      isActive
-                        ? 'bg-white text-coy-pink'
-                        : 'bg-coy-pink text-white'
-                    }`}
-                  >
+                  <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-medium bg-coy-accent text-white">
                     {item.badge}
                   </span>
                 )}
@@ -65,10 +51,10 @@ const Navbar = ({ matchesCount = 0 }) => {
           })}
         </nav>
 
-        {/* Right: Demo Profile / User Avatar */}
-        <div className="flex items-center gap-3">
+        {/* Right: Demo Profile Avatar */}
+        <div className="flex items-center gap-2.5">
           <div className="hidden sm:flex flex-col text-right">
-            <span className="text-xs font-semibold text-coy-text leading-tight">
+            <span className="text-xs font-medium text-coy-ink leading-tight">
               {DEMO_USER.name}
             </span>
             <span className="text-[10px] text-coy-muted">
@@ -76,16 +62,12 @@ const Navbar = ({ matchesCount = 0 }) => {
             </span>
           </div>
 
-          <div className="relative">
-            <div className="w-10 h-10 rounded-full border-2 border-coy-pink/40 p-0.5 shadow-sm">
-              <img
-                src={DEMO_USER.photo}
-                alt={DEMO_USER.name}
-                className="w-full h-full rounded-full object-cover"
-              />
-            </div>
-            {/* Active presence dot */}
-            <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white" />
+          <div className="w-8 h-8 rounded-full border border-coy-border overflow-hidden bg-coy-surface">
+            <img
+              src={DEMO_USER.photo}
+              alt={DEMO_USER.name}
+              className="w-full h-full object-cover"
+            />
           </div>
         </div>
       </div>
@@ -94,4 +76,3 @@ const Navbar = ({ matchesCount = 0 }) => {
 };
 
 export default Navbar;
-
