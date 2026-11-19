@@ -2,118 +2,119 @@ import mongoose from 'mongoose';
 import Profile from '../models/Profile.js';
 import Swipe from '../models/Swipe.js';
 import Match from '../models/Match.js';
+import { evaluateSwipe, sanitizeProfile } from '../matching.js';
 
 const DEMO_USER_ID = 'demo-user-1';
 
+// Per-user write serialization queue to prevent race conditions on rapid concurrent swipes
+const userLocks = new Map();
+
+function serializeForUser(userId, task) {
+  const previous = userLocks.get(userId) || Promise.resolve();
+  const current = previous.catch(() => {}).then(task);
+  userLocks.set(userId, current);
+
+  current.finally(() => {
+    if (userLocks.get(userId) === current) {
+      userLocks.delete(userId);
+    }
+  });
+
+  return current;
+}
+
 /**
- * POST /api/swipe
- * Body: { profileId: string, action: 'like' | 'pass' }
+ * POST /api/swipe & POST /swipe
+ * Records a swipe action ('like' | 'pass') on a profile.
  *
  * Requirements:
- * - Validate profileId and action.
- * - Prevent duplicate swipes (409 Conflict if already swiped).
- * - Save swipe to MongoDB.
- * - Check whether the profile has already liked the demo user.
- * - Only mutual likes trigger a match.
- * - Return { success: true, matched: boolean, match?: object }.
- * - Never expose one-sided incoming likes.
+ * - Reject invalid actions (only 'like' | 'pass') and unknown profile IDs.
+ * - Idempotent on repeat swipes (never creates duplicate swipes or matches).
+ * - Returns ONLY `{ matched: boolean, match?: profile }`.
+ * - No difference in status or body between a pass and a pending one-sided like.
  */
 export const handleSwipe = async (req, res, next) => {
   try {
     const { profileId, action } = req.body;
     const demoUserId = req.body.userId || DEMO_USER_ID;
 
-    // 1. Validation
+    // 1. Validate inputs
     if (!profileId) {
       return res.status(400).json({
-        success: false,
-        message: 'profileId is required',
+        error: 'profileId is required',
       });
     }
 
     if (!mongoose.Types.ObjectId.isValid(profileId)) {
       return res.status(400).json({
-        success: false,
-        message: 'Invalid profileId format',
+        error: 'Invalid profileId format',
       });
     }
 
     if (!['like', 'pass'].includes(action)) {
       return res.status(400).json({
-        success: false,
-        message: 'Action must be either "like" or "pass"',
+        error: 'Action must be either "like" or "pass"',
       });
     }
 
-    // 2. Check if target profile exists
-    // Explicitly select likedDemoUser here on the server only to evaluate mutual interest
+    // 2. Validate profile existence in DB
     const targetProfile = await Profile.findById(profileId).select('+likedDemoUser');
     if (!targetProfile) {
       return res.status(404).json({
-        success: false,
-        message: 'Profile not found',
+        error: 'Profile not found',
       });
     }
 
-    // 3. Duplicate swipe check
-    const existingSwipe = await Swipe.findOne({ demoUserId, profileId });
-    if (existingSwipe) {
-      return res.status(409).json({
-        success: false,
-        message: 'You have already swiped on this profile',
-      });
-    }
+    // 3. Process write safely with serialized lock per user
+    const result = await serializeForUser(demoUserId, async () => {
+      // Check for an existing swipe (idempotency)
+      const existingSwipe = await Swipe.findOne({ demoUserId, profileId });
+      if (existingSwipe) {
+        const existingMatch = await Match.findOne({ demoUserId, profileId });
+        if (existingMatch) {
+          return {
+            matched: true,
+            match: sanitizeProfile(targetProfile),
+          };
+        }
+        return {
+          matched: false,
+        };
+      }
 
-    // 4. Record swipe
-    await Swipe.create({
-      demoUserId,
-      profileId,
-      action,
+      // Record new swipe
+      await Swipe.create({
+        demoUserId,
+        profileId,
+        action,
+      });
+
+      // Evaluate matching using pure matching module
+      const evaluation = evaluateSwipe({ action, targetProfile });
+
+      if (evaluation.matched) {
+        await Match.findOneAndUpdate(
+          { demoUserId, profileId },
+          { demoUserId, profileId, createdAt: new Date() },
+          { upsert: true, new: true }
+        );
+      }
+
+      return evaluation;
     });
 
-    // 5. Evaluate matching condition
-    // Only if action is 'like' and the target profile previously liked the demo user
-    if (action === 'like' && targetProfile.likedDemoUser === true) {
-      // Create match (with idempotency)
-      const match = await Match.findOneAndUpdate(
-        { demoUserId, profileId },
-        { demoUserId, profileId, createdAt: new Date() },
-        { upsert: true, new: true }
-      );
-
-      return res.status(200).json({
-        success: true,
-        matched: true,
-        match: {
-          id: match._id,
-          profile: {
-            id: targetProfile._id,
-            name: targetProfile.name,
-            age: targetProfile.age,
-            photo: targetProfile.photo,
-            city: targetProfile.city,
-            college: targetProfile.college,
-            bio: targetProfile.bio,
-            interests: targetProfile.interests,
-          },
-        },
-      });
-    }
-
-    // Pass or one-sided like -> No match created, do not return match object
-    return res.status(200).json({
-      success: true,
-      matched: false,
-    });
+    return res.status(200).json(result);
   } catch (error) {
-    // Catch unique index violation race condition gracefully
     if (error.code === 11000) {
-      return res.status(409).json({
-        success: false,
-        message: 'You have already swiped on this profile',
+      // Rare unique-index collision: handle idempotently
+      const existingMatch = await Match.findOne({
+        demoUserId: req.body.userId || DEMO_USER_ID,
+        profileId: req.body.profileId,
+      });
+      return res.status(200).json({
+        matched: Boolean(existingMatch),
       });
     }
     next(error);
   }
 };
-

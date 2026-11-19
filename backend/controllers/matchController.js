@@ -1,11 +1,12 @@
 import Match from '../models/Match.js';
 import Swipe from '../models/Swipe.js';
+import { sanitizeProfile } from '../matching.js';
 
 const DEMO_USER_ID = 'demo-user-1';
 
 /**
- * GET /api/matches
- * Returns list of confirmed mutual matches for the demo user.
+ * GET /api/matches & GET /matches
+ * Returns list of confirmed mutual matches for the user.
  * Strictly guarantees privacy: does not expose one-sided likes.
  */
 export const getMatches = async (req, res, next) => {
@@ -24,18 +25,9 @@ export const getMatches = async (req, res, next) => {
     const formattedMatches = matches
       .filter((m) => m.profileId !== null)
       .map((m) => ({
-        id: m._id,
+        id: String(m._id),
         createdAt: m.createdAt,
-        profile: {
-          id: m.profileId._id,
-          name: m.profileId.name,
-          age: m.profileId.age,
-          photo: m.profileId.photo,
-          bio: m.profileId.bio,
-          city: m.profileId.city,
-          college: m.profileId.college,
-          interests: m.profileId.interests,
-        },
+        profile: sanitizeProfile(m.profileId),
       }));
 
     return res.status(200).json({
@@ -49,7 +41,7 @@ export const getMatches = async (req, res, next) => {
 };
 
 /**
- * POST /api/reset
+ * POST /api/matches/reset & POST /api/reset
  * Helper endpoint for testing & evaluator convenience.
  * Resets swipes and matches for the demo user.
  */
@@ -68,4 +60,3 @@ export const resetDemoData = async (req, res, next) => {
     next(error);
   }
 };
-
