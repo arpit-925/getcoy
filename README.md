@@ -1,164 +1,90 @@
-# Coy Discover – Full Stack SDE Intern Assignment
+# Coy Discover
 
-> **Coy Discover** is a high-performance, privacy-first swipe-based discovery platform inspired by Coy's core premise: an anonymous crush platform where your identity and interest are only revealed when the feeling is 100% mutual.
-
-Built with the **MERN** stack (React.js, Node.js, Express, MongoDB, Tailwind CSS, Framer Motion, and Lucide React) for the Coy SDE Intern take-home assignment.
-
----
-
-## 📸 Overview & Features
-
-### Core Capabilities
-1. **Interactive Fluid Swiping**:
-   - Touch gestures and mouse drag physics with **Framer Motion** (`drag="x"`, spring velocity, dynamic card rotation).
-   - Dynamic **LIKE** (#F53683) and **PASS** visual stamp indicators based on swipe distance and velocity.
-   - Dedicated floating action buttons with keyboard shortcuts (`←` for Pass, `→` for Like).
-   - Immediate double-submit prevention and debounced gesture locks during transitions.
-
-2. **Genuine Privacy-First Mutual Matching**:
-   - **One-Sided Likes Kept Secret**: Users who like you are never leaked in the feed, API responses, or frontend payloads.
-   - **Mutual Attraction Trigger**: A match is created *only* when both the demo user and the profile like each other.
-   - **Celebration Modal**: "It's a Match!" celebration with confetti burst, pulsing mutual hearts, and side-by-side circular avatars.
-
-3. **Persistent Feed State**:
-   - Swiped profiles (both liked and passed) are permanently tracked in MongoDB and will **never reappear** across page reloads or browser restarts.
-   - Clean empty state with friendly copy and a "Reset Demo Feed" action for testing.
-
-4. **Mutual Matches Tab**:
-   - Displays all confirmed mutual matches with real-time badge count synchronization.
-   - Click to inspect full profile details (college, city, bio, and pill-shaped interest tags).
-
-5. **Responsive & Coy-Inspired Brand Design**:
-   - Palette: Primary `#F53683`, Background `#FAF8FC`, White cards, Dark text `#19151F`, Muted grey `#716B7B`.
-   - Desktop: Sticky top navigation with active tab indicator and Demo user avatar.
-   - Mobile: Compact top header and bottom tab bar (`Home`, `Discover`, `Matches`).
-   - Clean typography using the **Inter** font family.
+> **Coy Discover** is a standalone anonymous-crush discovery application built with React, Vite, Node.js, Express, MongoDB, Tailwind CSS, and Framer Motion for the Coy SDE Intern assignment.
+> It introduces a swipe-based discovery interface where user interest is kept strictly private unless it is completely mutual.
 
 ---
 
-## 🛠️ Technology Stack
+## 🎨 Design Philosophy & Brand Identity
 
-| Layer | Technologies |
-|---|---|
-| **Frontend** | React.js (Vite), JavaScript (ES Modules), Tailwind CSS, Framer Motion, Lucide React, Axios, React Router DOM, Canvas-Confetti |
-| **Backend** | Node.js, Express.js, MongoDB, Mongoose, Morgan, Dotenv, CORS |
-| **Database** | MongoDB with compound indexes for duplicate prevention |
-| **Testing** | Node.js Native Test Runner (`node:test`, `node:assert`) |
-
----
-
-## 📁 Project Structure
-
-```text
-getcoy/
-├── backend/
-│   ├── config/
-│   │   └── db.js                 # MongoDB connection handler
-│   ├── controllers/
-│   │   ├── feedController.js     # GET /api/feed logic with strict privacy projections
-│   │   ├── swipeController.js    # POST /api/swipe logic & mutual match evaluation
-│   │   └── matchController.js    # GET /api/matches & reset helpers
-│   ├── data/
-│   │   └── profiles.json         # 32 diverse, realistic Indian mock profiles
-│   ├── middleware/
-│   │   └── errorHandler.js       # Centralized error handler
-│   ├── models/
-│   │   ├── Match.js              # Match schema with unique compound index
-│   │   ├── Profile.js            # Profile schema with hidden likedDemoUser flag
-│   │   └── Swipe.js              # Swipe schema with unique index per user/profile
-│   ├── routes/
-│   │   ├── feedRoutes.js
-│   │   ├── matchRoutes.js
-│   │   └── swipeRoutes.js
-│   ├── scripts/
-│   │   └── seed.js               # Database seeder (cleans and seeds 32 profiles)
-│   ├── tests/
-│   │   └── api.test.js           # Comprehensive automated API & privacy test suite
-│   ├── .env.example
-│   ├── package.json
-│   └── server.js                 # Express application entry point
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── BottomNavigation.jsx # Mobile navigation bar
-│   │   │   ├── EmptyState.jsx       # Polished empty state with action CTAs
-│   │   │   ├── InterestTags.jsx     # Pill-shaped tags
-│   │   │   ├── LoadingSkeleton.jsx  # Shimmer card skeleton
-│   │   │   ├── MatchModal.jsx       # Celebration modal with confetti
-│   │   │   ├── Navbar.jsx           # Desktop navigation header
-│   │   │   ├── ProfileCard.jsx      # Framer Motion draggable card with stamps
-│   │   │   └── SwipeButtons.jsx     # Like and Pass action controls
-│   │   ├── hooks/
-│   │   │   └── useFeed.js           # Feed state, swipe queue, and match management
-│   │   ├── pages/
-│   │   │   ├── Discover.jsx         # Primary discovery experience
-│   │   │   ├── Home.jsx             # Minimalist placeholder
-│   │   │   └── Matches.jsx          # Mutual matches grid & inspection modal
-│   │   ├── services/
-│   │   │   └── api.js               # Axios API client
-│   │   ├── App.jsx                  # Route definitions and layout shell
-│   │   ├── index.css                # Tailwind directives and custom utilities
-│   │   └── main.jsx                 # React root mounting
-│   ├── index.html
-│   ├── package.json
-│   ├── tailwind.config.js           # Brand colors (#F53683) and styling
-│   └── vite.config.js
-└── README.md
-```
+The interface avoids generic AI-generated templates, glowing gradient pills, and neon shadows in favor of a restrained, editorial dating product identity:
+- **Warm cream background**: `#FAF6F0`
+- **Near-black ink**: `#1A1715`
+- **Single muted accent**: Deep rose / warm tomato `#D6455D`
+- **Typography**: Display serif font (**Fraunces**) for wordmark, headings, and profile names, paired with **DM Sans** for legible body text.
+- **Microcopy with voice**:
+  - Pass action: *"Not this time"*
+  - Like action: *"Maybe..."*
+  - Empty state: *"Nobody left to judge. Check back soon."*
+  - Match celebration: *"You two. Finally."*
+  - Matches view: *"Mutual only. That's the whole point."*
+- **Viewports**: Crafted to fit comfortably on 390×844 mobile screens (and up) without vertical clipping or awkward scrolling.
 
 ---
 
-## 🚀 Local Installation & Setup
+## 🔒 Privacy Architecture (Core Promise)
+
+In Coy, an unrequited crush is never revealed to the recipient:
+1. **Server-Side Field Stripping**:
+   The `likedDemoUser` flag is defined with `select: false` in Mongoose and is stripped server-side from all `/feed` responses along with any potential aliases (`likesMe`, `likedYou`, `incomingLike`).
+2. **Neutral Feed Ordering**:
+   Unswiped profiles in `/feed` are randomized using a server-side Fisher-Yates shuffle. Position in the feed never leaks who has pre-liked you.
+3. **Identical Signals for Non-Matches**:
+   Passing and one-sided liking return the exact same HTTP 200 payload:
+   ```json
+   { "matched": false }
+   ```
+   No counts, badges, or header variations are sent for unrequited likes.
+4. **Idempotent Swipes**:
+   Repeat swipes on the same profile return the existing match status without duplicating records in MongoDB or throwing client errors.
+
+---
+
+## 👥 Demo Profiles & Guaranteed Mutual Matches
+
+The database seeds **32 distinct, realistic Indian profiles** across top colleges (IITs, St. Xavier's, BITS Pilani, NIFT, LSR, COEP).
+
+To test mutual matches during a demo, the following seeded profiles have **already liked the demo user** (`likedDemoUser: true`):
+- **Priya Sharma** (21, Architecture student, BMS College, Bengaluru)
+- **Ananya Sen** (20, Literature major, St. Xavier's College, Kolkata)
+- **Tara Iyer** (22, Neuroscience researcher, TIFR Mumbai)
+- **Meera Nambiar** (23, Classical dancer & coder, CUSAT, Kochi)
+- **Sanya Kapoor** (21, Fashion communication, NIFT Delhi)
+- **Zoya Akhtar** (22, Psychology major, Christ University, Bengaluru)
+
+Liking any of these profiles immediately triggers the **"You two. Finally."** match screen and adds them to your `/matches` view. Liking any profile without a pre-existing like (e.g. *Rohan Deshmukh*, *Kabir Malhotra*, *Arjun Singhal*) records the swipe but produces no match.
+
+---
+
+## ⚡ Quick Start
 
 ### Prerequisites
-- **Node.js** >= 18.x (tested on v24)
-- **MongoDB** running locally on port `27017` or a MongoDB Atlas connection string
+- Node.js >= 18
+- MongoDB running on `127.0.0.1:27017` (or configured via `MONGO_URI` in `backend/.env`)
 
-### 1. Clone & Setup Backend
+### 1. Backend Setup
 ```bash
 cd backend
-
-# Install dependencies
 npm install
-
-# Setup environment variables
-cp .env.example .env
-
-# Seed MongoDB with 32 realistic mock profiles
-npm run seed
-
-# Run automated backend test suite
-npm test
-
-# Start the backend server (runs on http://localhost:5000)
-npm start
+npm run seed     # Seeds 32 profiles and resets swipes/matches
+npm test         # Runs automated unit & integration test suite
+npm start        # Starts server on http://localhost:5000
 ```
 
-### 2. Setup Frontend
-In a separate terminal:
+### 2. Frontend Setup
+In a new terminal window:
 ```bash
 cd frontend
-
-# Install dependencies
 npm install
-
-# Setup environment variables
-cp .env.example .env
-
-# Start the Vite development server (runs on http://localhost:5173)
-npm run dev
+npm run dev      # Starts Vite on http://localhost:5173
 ```
 
 ---
 
-## 🔒 API Documentation & Privacy Guarantees
+## 📡 API Contract
 
-### 1. `GET /api/feed`
-Returns unswiped profiles for the active demo user.
-
-- **Privacy Guarantee**: `likedDemoUser` is excluded from both the Mongoose schema default select and explicit projection (`.select('-likedDemoUser -__v')`). Clients can never determine incoming likes ahead of time.
-- **Filtering**: Profiles with existing `Swipe` records (whether `'like'` or `'pass'`) are excluded via `$nin`.
+### 1. `GET /feed` (or `GET /api/feed`)
+Returns unswiped profiles for the active user, randomly shuffled, with all private like flags stripped.
 
 **Response (200 OK):**
 ```json
@@ -167,7 +93,7 @@ Returns unswiped profiles for the active demo user.
   "count": 32,
   "profiles": [
     {
-      "_id": "673f...",
+      "id": "673f...",
       "name": "Priya Sharma",
       "age": 21,
       "photo": "https://images.unsplash.com/...",
@@ -180,10 +106,8 @@ Returns unswiped profiles for the active demo user.
 }
 ```
 
----
-
-### 2. `POST /api/swipe`
-Records a user's swipe action on a profile.
+### 2. `POST /swipe` (or `POST /api/swipe`)
+Records a swipe action (`"like"` or `"pass"`).
 
 **Request Body:**
 ```json
@@ -192,29 +116,20 @@ Records a user's swipe action on a profile.
   "action": "like"
 }
 ```
-*(action can be `"like"` or `"pass"`)*
-
-- **Duplicate Swipe Handling**: Returns `409 Conflict` if the profile has already been swiped on.
-- **Mutual Match Evaluation**: Checks if `targetProfile.likedDemoUser === true` strictly on the server.
-- **Privacy Guarantee**: If `matched: false`, no incoming like data is revealed.
 
 **Response on Mutual Match (200 OK):**
 ```json
 {
-  "success": true,
   "matched": true,
   "match": {
     "id": "673f...",
-    "profile": {
-      "id": "673f...",
-      "name": "Priya Sharma",
-      "age": 21,
-      "photo": "https://images.unsplash.com/...",
-      "city": "Bengaluru",
-      "college": "BMS College of Architecture",
-      "bio": "...",
-      "interests": ["Architecture", "Filter Coffee"]
-    }
+    "name": "Priya Sharma",
+    "age": 21,
+    "photo": "https://images.unsplash.com/...",
+    "bio": "...",
+    "city": "Bengaluru",
+    "college": "BMS College of Architecture",
+    "interests": ["Architecture", "Filter Coffee"]
   }
 }
 ```
@@ -222,15 +137,12 @@ Records a user's swipe action on a profile.
 **Response on Non-Match or Pass (200 OK):**
 ```json
 {
-  "success": true,
   "matched": false
 }
 ```
 
----
-
-### 3. `GET /api/matches`
-Returns all mutual matches for the demo user.
+### 3. `GET /matches` (or `GET /api/matches`)
+Returns confirmed mutual matches only.
 
 **Response (200 OK):**
 ```json
@@ -240,13 +152,13 @@ Returns all mutual matches for the demo user.
   "matches": [
     {
       "id": "673f...",
-      "createdAt": "2026-11-19T00:15:28.915Z",
+      "createdAt": "2026-11-19T05:00:00.000Z",
       "profile": {
         "id": "673f...",
         "name": "Priya Sharma",
         "age": 21,
         "photo": "https://images.unsplash.com/...",
-        "bio": "Architecture student...",
+        "bio": "...",
         "city": "Bengaluru",
         "college": "BMS College of Architecture",
         "interests": ["Architecture", "Filter Coffee"]
@@ -258,47 +170,64 @@ Returns all mutual matches for the demo user.
 
 ---
 
-### 4. `POST /api/matches/reset`
-Convenience development endpoint to clear the demo user's swipes and matches so the evaluator can test multiple discovery sessions.
+## 🧪 Automated Tests
 
----
+The test suite in `backend/tests/api.test.js` covers:
+- Pure unit tests of `backend/matching.js` (`isMutualMatch`, `sanitizeProfile`, `evaluateSwipe`)
+- Like + existing like from profile => produces mutual match
+- Like without prior like from profile => produces no match
+- Pass action => never creates a match
+- Swiped profiles => never reappear in `/feed` across reloads
+- Privacy assertion => `/feed` JSON contains no `likedDemoUser`, `likesMe`, or incoming like fields
+- Idempotency => duplicate swipes on the same profile do not corrupt or duplicate data
+- Input validation => invalid action, invalid ObjectId, or non-existent profile returns 400/404
+- Storage persistence => data persists in MongoDB across operations
 
-## 🧪 Testing Scenarios (Automated Suite)
-
-The automated test suite (`backend/tests/api.test.js`) validates all five assignment scenarios:
-
-1. **Scenario 1**: `GET /api/feed` returns profiles and strictly verifies that `likedDemoUser` is absent.
-2. **Scenario 2**: Liking a profile that hasn't liked the demo user produces `matched: false`, no match object, and permanently excludes the profile from subsequent feeds.
-3. **Scenario 3**: Liking a profile that has liked the demo user creates an immediate mutual match, returns the full matched profile, and makes it accessible in `GET /api/matches`.
-4. **Scenario 4**: Passing a profile never creates a match even if they liked the user, and removes it from the feed across reloads.
-5. **Scenario 5**: Duplicate swipes on the same profile return `409 Conflict`.
-
-Run all tests:
+Run tests:
 ```bash
 cd backend && npm test
 ```
 
 ---
 
-## 📱 Interactive User Journey (Demo Flow)
+## 🛠️ Project Structure
 
-1. Open `http://localhost:5173/discover`.
-2. Observe the current profile card with high-resolution photo, name, college, city, bio, and interest tags.
-3. Swipe **Right** or click the **Heart** button:
-   - If that person secretly liked you (e.g. Priya Sharma, Ananya Sen, Meera Nambiar), the **"It's a Match!" celebration modal** appears with confetti and dual avatars!
-4. Swipe **Left** or click the **X** button:
-   - The card smoothly passes and is permanently dismissed.
-5. Navigate to the **Matches** tab:
-   - View your confirmed mutual matches in a responsive card grid. Click any card to inspect their complete bio.
-6. Refresh the browser at any time:
-   - Notice that none of the swiped profiles ever reappear.
-7. Upon swiping all 32 profiles:
-   - An elegant empty state appears with a one-click button to reset the demo feed.
-
----
-
-## 🚢 Deployment Guidelines
-
-- **Frontend**: Deployable to **Vercel** / **Netlify** / **Cloudflare Pages** by running `npm run build` and serving the `dist/` directory. Set `VITE_API_URL` to the production backend URL.
-- **Backend**: Deployable to **Render**, **Railway**, or **AWS EC2/Elastic Beanstalk**. Set `MONGO_URI` to a MongoDB Atlas cluster URI and `CLIENT_URL` to your production frontend domain.
-
+```text
+getcoy/
+├── backend/
+│   ├── config/db.js              # MongoDB connection
+│   ├── controllers/
+│   │   ├── feedController.js     # /feed handler with shuffle & privacy filter
+│   │   ├── swipeController.js    # /swipe handler with serialized writes & idempotency
+│   │   └── matchController.js    # /matches handler
+│   ├── data/profiles.json        # 32 seeded mock profiles
+│   ├── matching.js               # Pure matching logic (unit-testable)
+│   ├── models/                   # Profile, Swipe, Match Mongoose models
+│   ├── routes/                   # Express routes with /api and direct aliases
+│   ├── scripts/seed.js           # Database reset and seeder
+│   ├── server.js                 # Express application
+│   └── tests/api.test.js         # Integration and unit tests
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── BottomNavigation.jsx  # Mobile 3-tab navigation bar
+│   │   │   ├── EmptyState.jsx        # Handcrafted empty state illustration
+│   │   │   ├── InterestTags.jsx      # Neutral outline interest chips
+│   │   │   ├── LoadingSkeleton.jsx   # Card loading placeholder
+│   │   │   ├── MatchModal.jsx        # "You two. Finally." celebration modal
+│   │   │   ├── Navbar.jsx            # Desktop top navigation
+│   │   │   ├── ProfileCard.jsx       # 3-card stack, gestures, LIKE/PASS stamps
+│   │   │   └── SwipeButtons.jsx      # "Not this time" & "Maybe..." buttons
+│   │   ├── hooks/useFeed.js          # Optimistic swipe queue & rollback
+│   │   ├── pages/
+│   │   │   ├── Discover.jsx          # Swipe discovery experience
+│   │   │   ├── Home.jsx              # Intentionally minimal placeholder
+│   │   │   └── Matches.jsx           # Responsive mutual matches grid
+│   │   ├── services/api.js           # Axios API client
+│   │   ├── App.jsx                   # Layout shell & routes
+│   │   └── index.css                 # Custom scrollbars & Tailwind base
+│   ├── index.html                    # Fraunces & DM Sans typography
+│   └── tailwind.config.js            # Coy color palette & radii
+└── README.md
+```
