@@ -11,7 +11,7 @@ const SwipeButtons = ({ onPass, onLike, disabled = false }) => {
           disabled={disabled}
           type="button"
           aria-label="Pass profile (Left Arrow: Not this time)"
-          className={`group flex items-center gap-2 px-5 py-2.5 rounded-full bg-white border border-coy-border text-coy-muted text-xs font-medium transition-all duration-150 ${
+          className={`group flex items-center gap-2 min-w-[44px] min-h-[44px] px-5 py-2.5 rounded-full bg-white border border-coy-border text-coy-muted text-xs font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coy-border ${
             disabled
               ? 'opacity-40 cursor-not-allowed'
               : 'hover:text-coy-ink hover:border-coy-ink/30 active:scale-95'

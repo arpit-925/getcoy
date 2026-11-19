@@ -29,30 +29,36 @@ const ProfileCard = ({
 
   // Animate programmatic trigger (from buttons or keyboard arrows)
   useEffect(() => {
+    let active = true;
+
     if (animatingDirection === 'like') {
       controls.start({
         x: 450,
         rotate: 15,
         opacity: 0,
-        transition: { duration: 0.28, ease: 'easeOut' },
+        transition: { duration: 0.22, ease: 'easeOut' },
       }).then(() => {
-        onSwipe('like');
-        x.set(0);
-        controls.set({ x: 0, rotate: 0, opacity: 1 });
+        if (active) {
+          onSwipe('like');
+        }
       });
     } else if (animatingDirection === 'pass') {
       controls.start({
         x: -450,
         rotate: -15,
         opacity: 0,
-        transition: { duration: 0.28, ease: 'easeOut' },
+        transition: { duration: 0.22, ease: 'easeOut' },
       }).then(() => {
-        onSwipe('pass');
-        x.set(0);
-        controls.set({ x: 0, rotate: 0, opacity: 1 });
+        if (active) {
+          onSwipe('pass');
+        }
       });
     }
-  }, [animatingDirection, controls, onSwipe, x]);
+
+    return () => {
+      active = false;
+    };
+  }, [animatingDirection, controls, onSwipe]);
 
   const handleDragEnd = async (event, info) => {
     if (disabled || animatingDirection) return;
@@ -65,21 +71,17 @@ const ProfileCard = ({
         x: 450,
         rotate: 15,
         opacity: 0,
-        transition: { duration: 0.22, ease: 'easeOut' },
+        transition: { duration: 0.2, ease: 'easeOut' },
       });
       onSwipe('like');
-      x.set(0);
-      controls.set({ x: 0, rotate: 0, opacity: 1 });
     } else if (info.offset.x < -threshold || info.velocity.x < -velocityThreshold) {
       await controls.start({
         x: -450,
         rotate: -15,
         opacity: 0,
-        transition: { duration: 0.22, ease: 'easeOut' },
+        transition: { duration: 0.2, ease: 'easeOut' },
       });
       onSwipe('pass');
-      x.set(0);
-      controls.set({ x: 0, rotate: 0, opacity: 1 });
     } else {
       // Spring back if threshold not met
       controls.start({
