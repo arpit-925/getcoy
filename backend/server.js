@@ -74,13 +74,25 @@ app.get('/', (req, res) => {
 // Centralized error handler
 app.use(errorHandler);
 
-// Connect DB and listen if not in testing mode
+// Connect DB and listen if executed directly
 const isMain = process.argv[1] && process.argv[1].endsWith('server.js');
 if (isMain && process.env.NODE_ENV !== 'test') {
   connectDB()
     .then(() => {
-      app.listen(PORT, () => {
+      const server = app.listen(PORT, () => {
         console.log(`[Coy Discover Server] Running on http://localhost:${PORT}`);
+      });
+
+      server.on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+          console.error(`\n[Coy Discover] Port ${PORT} is already in use by another process.`);
+          console.error(`To free port ${PORT} on Windows PowerShell, run:`);
+          console.error(`  Stop-Process -Id (Get-NetTCPConnection -LocalPort ${PORT}).OwningProcess -Force\n`);
+          process.exit(1);
+        } else {
+          console.error('[Coy Discover Server Error]', err);
+          process.exit(1);
+        }
       });
     })
     .catch((err) => {
