@@ -1,32 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import request from 'supertest';
 import mongoose from 'mongoose';
 import app from '../server.js';
 import Profile from '../models/Profile.js';
 import Swipe from '../models/Swipe.js';
 import Match from '../models/Match.js';
 import connectDB from '../config/db.js';
-
-// Helper to make fast internal HTTP requests against Express app
-const request = async (method, path, body = null) => {
-  const server = app.listen(0);
-  const { port } = server.address();
-  const url = `http://127.0.0.1:${port}${path}`;
-
-  try {
-    const res = await fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      ...(body ? { body: JSON.stringify(body) } : {}),
-    });
-    const data = await res.json();
-    return { status: res.status, data };
-  } finally {
-    await new Promise((resolve) => server.close(resolve));
-  }
-};
+import { isMutualMatch, sanitizeProfile, evaluateSwipe } from '../matching.js';
 
 test.before(async () => {
   process.env.NODE_ENV = 'test';
@@ -37,120 +18,261 @@ test.after(async () => {
   await mongoose.connection.close();
 });
 
-test('Scenario 1: GET /api/feed returns profiles and strictly protects privacy', async () => {
-  const { status, data } = await request('GET', '/api/feed');
-  assert.equal(status, 200);
-  assert.equal(data.success, true);
-  assert.ok(data.profiles.length > 0, 'Feed should return available profiles');
+// -------------------------------------------------------------
+// Unit Tests: Pure Matching Logic (matching.js)
+// -------------------------------------------------------------
+test('Unit: isMutualMatch returns true only on like + target liked user', () => {
+  assert.equal(isMutualMatch('like', true), true);
+  assert.equal(isMutualMatch('like', false), false);
+  assert.equal(isMutualMatch('pass', true), false, 'Pass must never match even if liked');
+  assert.equal(isMutualMatch('pass', false), false);
+  assert.equal(isMutualMatch('invalid', true), false);
+});
 
-  // Verify privacy: likedDemoUser must NEVER exist on any feed profile
-  for (const profile of data.profiles) {
-    assert.equal(profile.likedDemoUser, undefined, 'likedDemoUser must NOT be exposed in feed');
-    assert.ok(profile.name, 'Profile must have name');
-    assert.ok(profile.photo, 'Profile must have photo');
-    assert.ok(profile.bio, 'Profile must have bio');
+test('Unit: sanitizeProfile completely strips private like fields', () => {
+  const mockRaw = {
+    _id: '673f1234567890abcdef1234',
+    name: 'Test Candidate',
+    likedDemoUser: true,
+    likesMe: true,
+    likedYou: true,
+    incomingLike: true,
+    __v: 0,
+  };
+
+  const clean = sanitizeProfile(mockRaw);
+  assert.equal(clean.likedDemoUser, undefined);
+  assert.equal(clean.likesMe, undefined);
+  assert.equal(clean.likedYou, undefined);
+  assert.equal(clean.incomingLike, undefined);
+  assert.equal(clean.__v, undefined);
+  assert.equal(clean.name, 'Test Candidate');
+});
+
+test('Unit: evaluateSwipe returns correct matched payload shape', () => {
+  const likedProfile = {
+    _id: 'p1',
+    name: 'Priya',
+    likedDemoUser: true,
+  };
+
+  const matchRes = evaluateSwipe({ action: 'like', targetProfile: likedProfile });
+  assert.equal(matchRes.matched, true);
+  assert.equal(matchRes.match.name, 'Priya');
+  assert.equal(matchRes.match.likedDemoUser, undefined);
+
+  const passRes = evaluateSwipe({ action: 'pass', targetProfile: likedProfile });
+  assert.equal(passRes.matched, false);
+  assert.equal(passRes.match, undefined);
+});
+
+// -------------------------------------------------------------
+// Integration Tests: REST APIs (supertest)
+// -------------------------------------------------------------
+
+test('1. like + existing like from profile => match', async () => {
+  const testUserId = `test-user-${Date.now()}-1`;
+  const secretCrush = await Profile.findOne({ likedDemoUser: true }).select('+likedDemoUser');
+  assert.ok(secretCrush, 'Seeded profile with likedDemoUser: true must exist');
+
+  const res = await request(app)
+    .post('/api/swipe')
+    .send({
+      userId: testUserId,
+      profileId: secretCrush._id.toString(),
+      action: 'like',
+    });
+
+  assert.equal(res.status, 200);
+  assert.equal(res.body.matched, true);
+  assert.ok(res.body.match, 'Must include match profile');
+  assert.equal(res.body.match.name, secretCrush.name);
+  assert.equal(res.body.match.likedDemoUser, undefined);
+
+  // Check /matches
+  const matchesRes = await request(app).get(`/api/matches?userId=${testUserId}`);
+  assert.equal(matchesRes.status, 200);
+  assert.equal(matchesRes.body.count, 1);
+  assert.equal(matchesRes.body.matches[0].profile.name, secretCrush.name);
+});
+
+test('2. like without a prior like from profile => no match', async () => {
+  const testUserId = `test-user-${Date.now()}-2`;
+  const unrequited = await Profile.findOne({ likedDemoUser: false }).select('+likedDemoUser');
+  assert.ok(unrequited, 'Seeded profile with likedDemoUser: false must exist');
+
+  const res = await request(app)
+    .post('/api/swipe')
+    .send({
+      userId: testUserId,
+      profileId: unrequited._id.toString(),
+      action: 'like',
+    });
+
+  assert.equal(res.status, 200);
+  assert.equal(res.body.matched, false);
+  assert.equal(res.body.match, undefined);
+
+  // Check /matches remains empty
+  const matchesRes = await request(app).get(`/api/matches?userId=${testUserId}`);
+  assert.equal(matchesRes.body.count, 0);
+});
+
+test('3. pass never creates a match', async () => {
+  const testUserId = `test-user-${Date.now()}-3`;
+  // Even if profile liked the user
+  const secretCrush = await Profile.findOne({ likedDemoUser: true }).select('+likedDemoUser');
+
+  const res = await request(app)
+    .post('/api/swipe')
+    .send({
+      userId: testUserId,
+      profileId: secretCrush._id.toString(),
+      action: 'pass',
+    });
+
+  assert.equal(res.status, 200);
+  assert.equal(res.body.matched, false);
+  assert.equal(res.body.match, undefined);
+
+  // Matches must be empty
+  const matchesRes = await request(app).get(`/api/matches?userId=${testUserId}`);
+  assert.equal(matchesRes.body.count, 0);
+});
+
+test('4. swiped profiles never reappear in /feed', async () => {
+  const testUserId = `test-user-${Date.now()}-4`;
+  const profileToSwipe = await Profile.findOne();
+
+  // Initial feed contains this profile
+  const feed1 = await request(app).get(`/api/feed?userId=${testUserId}`);
+  const initialIds = feed1.body.profiles.map((p) => String(p._id || p.id));
+  assert.ok(initialIds.includes(String(profileToSwipe._id)));
+
+  // Swipe on it
+  await request(app)
+    .post('/api/swipe')
+    .send({
+      userId: testUserId,
+      profileId: profileToSwipe._id.toString(),
+      action: 'pass',
+    });
+
+  // Subsequent feed must exclude it
+  const feed2 = await request(app).get(`/api/feed?userId=${testUserId}`);
+  const subsequentIds = feed2.body.profiles.map((p) => String(p._id || p.id));
+  assert.ok(!subsequentIds.includes(String(profileToSwipe._id)));
+});
+
+test('5. /feed JSON contains no field revealing who liked the user', async () => {
+  const res = await request(app).get('/api/feed');
+  assert.equal(res.status, 200);
+  assert.ok(res.body.profiles.length > 0);
+
+  for (const profile of res.body.profiles) {
+    assert.equal(profile.likedDemoUser, undefined);
+    assert.equal(profile.likesMe, undefined);
+    assert.equal(profile.likedYou, undefined);
+    assert.equal(profile.incomingLike, undefined);
+    assert.equal(profile.isIncomingLike, undefined);
+    assert.ok(profile.name);
+    assert.ok(profile.photo);
   }
 });
 
-test('Scenario 2: Like a profile that has NOT liked demo user -> No match created & profile excluded on subsequent feed', async () => {
-  const testUserId = `test-user-${Date.now()}`;
+test('6. duplicate swipe on the same profile is handled safely (idempotent)', async () => {
+  const testUserId = `test-user-${Date.now()}-6`;
+  const crush = await Profile.findOne({ likedDemoUser: true }).select('+likedDemoUser');
 
-  // Find a profile where likedDemoUser is false
-  const notLikedProfile = await Profile.findOne({ likedDemoUser: false }).select('+likedDemoUser');
-  assert.ok(notLikedProfile, 'Should find profile with likedDemoUser: false');
-
-  // Perform 'like' swipe
-  const { status, data } = await request('POST', '/api/swipe', {
-    userId: testUserId,
-    profileId: notLikedProfile._id.toString(),
-    action: 'like',
-  });
-
-  assert.equal(status, 200);
-  assert.equal(data.success, true);
-  assert.equal(data.matched, false, 'Should NOT create match when mutual like is missing');
-  assert.equal(data.match, undefined, 'Should not return match object');
-
-  // Verify profile is now excluded from the user feed
-  const feedRes = await request('GET', `/api/feed?userId=${testUserId}`);
-  const ids = feedRes.data.profiles.map((p) => p._id);
-  assert.ok(!ids.includes(notLikedProfile._id.toString()), 'Swiped profile must not appear in feed');
-});
-
-test('Scenario 3: Like a profile that HAS liked demo user -> Mutual match created and appears in /api/matches', async () => {
-  const testUserId = `test-user-${Date.now()}`;
-
-  // Find a profile with likedDemoUser: true
-  const secretCrushProfile = await Profile.findOne({ likedDemoUser: true }).select('+likedDemoUser');
-  assert.ok(secretCrushProfile, 'Should find profile with likedDemoUser: true');
-
-  // Perform 'like' swipe
-  const { status, data } = await request('POST', '/api/swipe', {
-    userId: testUserId,
-    profileId: secretCrushProfile._id.toString(),
-    action: 'like',
-  });
-
-  assert.equal(status, 200);
-  assert.equal(data.success, true);
-  assert.equal(data.matched, true, 'Mutual like must result in a match');
-  assert.ok(data.match, 'Match payload must be returned on mutual match');
-  assert.equal(data.match.profile.name, secretCrushProfile.name);
-
-  // Fetch /api/matches
-  const matchRes = await request('GET', `/api/matches?userId=${testUserId}`);
-  assert.equal(matchRes.status, 200);
-  assert.equal(matchRes.data.success, true);
-  assert.equal(matchRes.data.count, 1);
-  assert.equal(matchRes.data.matches[0].profile.name, secretCrushProfile.name);
-  assert.equal(matchRes.data.matches[0].profile.likedDemoUser, undefined, 'Privacy preserved in matches');
-});
-
-test('Scenario 4: Pass action never creates match and removes profile from feed', async () => {
-  const testUserId = `test-user-${Date.now()}`;
-
-  // Choose a profile that liked demo user, but user passes
-  const secretCrushProfile = await Profile.findOne({ likedDemoUser: true }).select('+likedDemoUser');
-
-  const { status, data } = await request('POST', '/api/swipe', {
-    userId: testUserId,
-    profileId: secretCrushProfile._id.toString(),
-    action: 'pass',
-  });
-
-  assert.equal(status, 200);
-  assert.equal(data.success, true);
-  assert.equal(data.matched, false, 'Passing must NEVER create a match even if they liked you');
-
-  // Verify matches list is empty
-  const matchRes = await request('GET', `/api/matches?userId=${testUserId}`);
-  assert.equal(matchRes.data.count, 0);
-
-  // Verify excluded from feed
-  const feedRes = await request('GET', `/api/feed?userId=${testUserId}`);
-  const ids = feedRes.data.profiles.map((p) => p._id);
-  assert.ok(!ids.includes(secretCrushProfile._id.toString()), 'Passed profile must not appear in feed');
-});
-
-test('Scenario 5: Duplicate swipe prevention (409 Conflict)', async () => {
-  const testUserId = `test-user-${Date.now()}`;
-  const profile = await Profile.findOne();
-
-  // First swipe
-  const res1 = await request('POST', '/api/swipe', {
-    userId: testUserId,
-    profileId: profile._id.toString(),
-    action: 'like',
-  });
+  // First swipe: should produce match
+  const res1 = await request(app)
+    .post('/api/swipe')
+    .send({
+      userId: testUserId,
+      profileId: crush._id.toString(),
+      action: 'like',
+    });
   assert.equal(res1.status, 200);
+  assert.equal(res1.body.matched, true);
 
-  // Duplicate swipe
-  const res2 = await request('POST', '/api/swipe', {
-    userId: testUserId,
-    profileId: profile._id.toString(),
-    action: 'like',
+  // Second duplicate swipe: should be idempotent, returning same match without duplicate DB records
+  const res2 = await request(app)
+    .post('/api/swipe')
+    .send({
+      userId: testUserId,
+      profileId: crush._id.toString(),
+      action: 'like',
+    });
+  assert.equal(res2.status, 200);
+  assert.equal(res2.body.matched, true);
+
+  // Check DB counts for this user and profile
+  const swipeCount = await Swipe.countDocuments({
+    demoUserId: testUserId,
+    profileId: crush._id,
   });
-  assert.equal(res2.status, 409, 'Duplicate swipe must return 409 Conflict');
-  assert.equal(res2.data.success, false);
+  const matchCount = await Match.countDocuments({
+    demoUserId: testUserId,
+    profileId: crush._id,
+  });
+  assert.equal(swipeCount, 1, 'Must have exactly 1 Swipe record');
+  assert.equal(matchCount, 1, 'Must have exactly 1 Match record');
 });
 
+test('7. invalid profile ID / invalid action returns an error', async () => {
+  const testUserId = `test-user-${Date.now()}-7`;
+
+  // Invalid action
+  const resBadAction = await request(app)
+    .post('/api/swipe')
+    .send({
+      userId: testUserId,
+      profileId: new mongoose.Types.ObjectId().toString(),
+      action: 'superlike',
+    });
+  assert.equal(resBadAction.status, 400);
+  assert.ok(resBadAction.body.error);
+
+  // Invalid profileId format
+  const resBadId = await request(app)
+    .post('/api/swipe')
+    .send({
+      userId: testUserId,
+      profileId: 'not-a-valid-object-id',
+      action: 'like',
+    });
+  assert.equal(resBadId.status, 400);
+
+  // Non-existent profile
+  const resNotFound = await request(app)
+    .post('/api/swipe')
+    .send({
+      userId: testUserId,
+      profileId: new mongoose.Types.ObjectId().toString(),
+      action: 'like',
+    });
+  assert.equal(resNotFound.status, 404);
+});
+
+test('8. persistence: data is still there after querying database collections', async () => {
+  const testUserId = `test-user-${Date.now()}-8`;
+  const crush = await Profile.findOne({ likedDemoUser: true }).select('+likedDemoUser');
+
+  // Perform swipe
+  await request(app)
+    .post('/api/swipe')
+    .send({
+      userId: testUserId,
+      profileId: crush._id.toString(),
+      action: 'like',
+    });
+
+  // Query MongoDB collections directly to ensure persistent storage
+  const persistedSwipe = await Swipe.findOne({ demoUserId: testUserId, profileId: crush._id });
+  const persistedMatch = await Match.findOne({ demoUserId: testUserId, profileId: crush._id });
+
+  assert.ok(persistedSwipe, 'Swipe must be written to MongoDB');
+  assert.equal(persistedSwipe.action, 'like');
+  assert.ok(persistedMatch, 'Match must be written to MongoDB');
+  assert.equal(String(persistedMatch.profileId), String(crush._id));
+});
