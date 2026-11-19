@@ -1,0 +1,323 @@
+[
+  {
+    "name": "Priya Sharma",
+    "age": 21,
+    "photo": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80",
+    "bio": "Architecture student obsessed with brutalist buildings, artisanal filter coffee, and acoustic covers at 2 AM.",
+    "city": "Bengaluru",
+    "college": "BMS College of Architecture",
+    "interests": ["Architecture", "Filter Coffee", "Indie Music", "Sketching", "Vinyl Records"],
+    "likedDemoUser": true
+  },
+  {
+    "name": "Rohan Deshmukh",
+    "age": 22,
+    "photo": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&auto=format&fit=crop&q=80",
+    "bio": "Building autonomous drones by day, jamming on bass guitar by night. Let's debate sci-fi movies over sourdough pizza.",
+    "city": "Pune",
+    "college": "COEP Pune",
+    "interests": ["Robotics", "Bass Guitar", "Sci-Fi", "Sourdough", "Anime"],
+    "likedDemoUser": false
+  },
+  {
+    "name": "Ananya Sen",
+    "age": 20,
+    "photo": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&auto=format&fit=crop&q=80",
+    "bio": "Literature major who will definitely judge your bookshelf. Always down for spontaneous museum dates and hot chocolate.",
+    "city": "Kolkata",
+    "college": "St. Xavier's College",
+    "interests": ["Literature", "Museums", "Poetry", "Hot Chocolate", "Thrifting"],
+    "likedDemoUser": true
+  },
+  {
+    "name": "Kabir Malhotra",
+    "age": 23,
+    "photo": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&auto=format&fit=crop&q=80",
+    "bio": "Product designer at a fintech startup. Weekend cyclist, espresso enthusiast, and amateur pottery maker.",
+    "city": "Gurugram",
+    "college": "NID Ahmedabad",
+    "interests": ["Design", "Cycling", "Espresso", "Pottery", "Typography"],
+    "likedDemoUser": false
+  },
+  {
+    "name": "Tara Iyer",
+    "age": 22,
+    "photo": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&auto=format&fit=crop&q=80",
+    "bio": "Neuroscience researcher fascinated by memory formation. Tell me your most vivid childhood story.",
+    "city": "Mumbai",
+    "college": "TIFR Mumbai",
+    "interests": ["Neuroscience", "Podcasts", "Badminton", "Baking", "Scrabble"],
+    "likedDemoUser": true
+  },
+  {
+    "name": "Arjun Singhal",
+    "age": 21,
+    "photo": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&auto=format&fit=crop&q=80",
+    "bio": "Computer Science student training for my first half-marathon. High on matcha lattes and lo-fi hip hop.",
+    "city": "Delhi",
+    "college": "IIT Delhi",
+    "interests": ["Running", "Matcha", "Lo-Fi Beats", "Hackathons", "Chess"],
+    "likedDemoUser": false
+  },
+  {
+    "name": "Meera Nambiar",
+    "age": 23,
+    "photo": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&auto=format&fit=crop&q=80",
+    "bio": "Classical dancer balancing rhythm with code. Sunsets by the beach, spicy street food, and spontaneous road trips.",
+    "city": "Kochi",
+    "college": "CUSAT",
+    "interests": ["Mohiniyattam", "Street Food", "Beaches", "Road Trips", "Photography"],
+    "likedDemoUser": true
+  },
+  {
+    "name": "Devansh Roy",
+    "age": 22,
+    "photo": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&auto=format&fit=crop&q=80",
+    "bio": "Aspiring filmmaker capturing Mumbai's monsoon soul. Currently writing an indie short film about late-night train rides.",
+    "city": "Mumbai",
+    "college": "Whistling Woods International",
+    "interests": ["Cinematography", "Screenwriting", "Jazz", "Street Photography", "Analog Film"],
+    "likedDemoUser": false
+  },
+  {
+    "name": "Sanya Kapoor",
+    "age": 21,
+    "photo": "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&auto=format&fit=crop&q=80",
+    "bio": "Fashion communication grad who believes every outfit tells a story. Golden hour walks and retro pop playlist curator.",
+    "city": "New Delhi",
+    "college": "NIFT Delhi",
+    "interests": ["Fashion", "Vintage", "Pop Music", "Art Galleries", "Coffee Roasting"],
+    "likedDemoUser": true
+  },
+  {
+    "name": "Aarav Patel",
+    "age": 24,
+    "photo": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&auto=format&fit=crop&q=80",
+    "bio": "Fintech analyst who actually enjoys spreadsheets. Outside work: calisthenics, board games, and finding the best biryani.",
+    "city": "Hyderabad",
+    "college": "ISB Hyderabad",
+    "interests": ["Biryani", "Calisthenics", "Board Games", "Investing", "Formula 1"],
+    "likedDemoUser": false
+  },
+  {
+    "name": "Zoya Akhtar",
+    "age": 22,
+    "photo": "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&auto=format&fit=crop&q=80",
+    "bio": "Psychology major passionate about cognitive biases and mental wellness. Dog mom to an overly enthusiastic Golden Retriever.",
+    "city": "Bengaluru",
+    "college": "Christ University",
+    "interests": ["Psychology", "Dogs", "Mindfulness", "Baking", "Cold Brew"],
+    "likedDemoUser": true
+  },
+  {
+    "name": "Vivaan Mehta",
+    "age": 20,
+    "photo": "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=800&auto=format&fit=crop&q=80",
+    "bio": "Economics nerd studying market psychology. Big fan of table tennis, standup comedy, and late-night Dosa runs.",
+    "city": "Ahmedabad",
+    "college": "St. Xavier's Ahmedabad",
+    "interests": ["Economics", "Standup Comedy", "Table Tennis", "Dosa", "Podcasts"],
+    "likedDemoUser": false
+  },
+  {
+    "name": "Rhea Chakraborty",
+    "age": 23,
+    "photo": "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=800&auto=format&fit=crop&q=80",
+    "bio": "Environmental scientist on a mission to eliminate single-use plastics. Plant hoarder with 40+ houseplants.",
+    "city": "Dehradun",
+    "college": "Forest Research Institute",
+    "interests": ["Sustainability", "Houseplants", "Hiking", "Bird Watching", "Zero Waste"],
+    "likedDemoUser": true
+  },
+  {
+    "name": "Aditya Verma",
+    "age": 21,
+    "photo": "https://images.unsplash.com/photo-1513956589380-bad6acb9b9d4?w=800&auto=format&fit=crop&q=80",
+    "bio": "Electrical engineering student building electric go-karts. Formula 1 fanatic who never misses a lights-out.",
+    "city": "Chennai",
+    "college": "IIT Madras",
+    "interests": ["Formula 1", "EVs", "Rock Climbing", "Coffee", "Gaming"],
+    "likedDemoUser": false
+  },
+  {
+    "name": "Kavya Menon",
+    "age": 22,
+    "photo": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&auto=format&fit=crop&q=80",
+    "bio": "Journalist covering culture and social movements. Pen and paper enthusiast, chai stall conversationalist, and cat whisperer.",
+    "city": "New Delhi",
+    "college": "Lady Shri Ram College",
+    "interests": ["Journalism", "Chai", "Cats", "Street Art", "Documentaries"],
+    "likedDemoUser": true
+  },
+  {
+    "name": "Siddharth Jain",
+    "age": 23,
+    "photo": "https://images.unsplash.com/photo-1480429370139-e0132c086e2a?w=800&auto=format&fit=crop&q=80",
+    "bio": "Data engineer into distributed systems and hiking Himalayan trails. Looking for someone to conquer mountain passes with.",
+    "city": "Bengaluru",
+    "college": "BITS Pilani",
+    "interests": ["Trekking", "Himalayas", "Big Data", "Camping", "Astronomy"],
+    "likedDemoUser": false
+  },
+  {
+    "name": "Diya Joshi",
+    "age": 20,
+    "photo": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&auto=format&fit=crop&q=80",
+    "bio": "Visual arts undergrad. Creating dreamscapes with watercolors and experimenting with ceramic mugs.",
+    "city": "Jaipur",
+    "college": "Rajasthan School of Art",
+    "interests": ["Watercolor", "Ceramics", "Flea Markets", "Indie Cinema", "Pastries"],
+    "likedDemoUser": false
+  },
+  {
+    "name": "Pranav Kulkarni",
+    "age": 22,
+    "photo": "https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=800&auto=format&fit=crop&q=80",
+    "bio": "Medical intern surviving on adrenaline and black coffee. Always up for guitar jams and deep philosophical talks.",
+    "city": "Mumbai",
+    "college": "Grant Medical College",
+    "interests": ["Medicine", "Acoustic Guitar", "Philosophy", "Swimming", "Chess"],
+    "likedDemoUser": true
+  },
+  {
+    "name": "Isha Saxena",
+    "age": 21,
+    "photo": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80",
+    "bio": "Marketing strategist who loves brand storytelling. Big foodie on a quest for the ultimate butter chicken in town.",
+    "city": "Chandigarh",
+    "college": "Panjab University",
+    "interests": ["Foodie", "Storytelling", "Pilates", "Travel", "R&B"],
+    "likedDemoUser": false
+  },
+  {
+    "name": "Nikhil Agarwal",
+    "age": 24,
+    "photo": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&auto=format&fit=crop&q=80",
+    "bio": "Founder building a micro-SaaS. Voracious reader of non-fiction, coffee snob, and occasional tennis player.",
+    "city": "Hyderabad",
+    "college": "IIIT Hyderabad",
+    "interests": ["Startups", "Tennis", "Pour Over", "Reading", "Tech Trends"],
+    "likedDemoUser": false
+  },
+  {
+    "name": "Tanvi Reddy",
+    "age": 21,
+    "photo": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&auto=format&fit=crop&q=80",
+    "bio": "Law student advocating for digital privacy and internet freedom. Passionate baker whose banana bread is legendary.",
+    "city": "Bengaluru",
+    "college": "NLSIU Bengaluru",
+    "interests": ["Debating", "Baking", "Privacy", "Vinyl", "Yoga"],
+    "likedDemoUser": true
+  },
+  {
+    "name": "Rishi Nair",
+    "age": 22,
+    "photo": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&auto=format&fit=crop&q=80",
+    "bio": "Sound engineer and synth collector. I spend weekends mixing ambient music and hunting for vintage audio gear.",
+    "city": "Kochi",
+    "college": "Govt. Model Engineering College",
+    "interests": ["Music Production", "Modular Synths", "Surfing", "Coffee", "Graphic Novels"],
+    "likedDemoUser": false
+  },
+  {
+    "name": "Alia Bhattacharya",
+    "age": 22,
+    "photo": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&auto=format&fit=crop&q=80",
+    "bio": "Bio-informatics student researching CRISPR therapeutics. Weekend baker, plant mom, and museum hopper.",
+    "city": "Pune",
+    "college": "IISER Pune",
+    "interests": ["Genetics", "Art Exhibitions", "Crochet", "French Cinema", "Tiramisu"],
+    "likedDemoUser": false
+  },
+  {
+    "name": "Manav Chawla",
+    "age": 23,
+    "photo": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&auto=format&fit=crop&q=80",
+    "bio": "Consultant by week, stand-up comic by weekend. Looking for an audience or at least someone who laughs at my puns.",
+    "city": "Gurugram",
+    "college": "SRCC Delhi",
+    "interests": ["Comedy", "Improv", "Golf", "Craft Beer", "Podcasts"],
+    "likedDemoUser": false
+  },
+  {
+    "name": "Sneha Bose",
+    "age": 21,
+    "photo": "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&auto=format&fit=crop&q=80",
+    "bio": "Sociology student examining modern relationships and intimacy. Fond of old bookshops, rain on windowpanes, and Darjeeling tea.",
+    "city": "Kolkata",
+    "college": "Presidency University",
+    "interests": ["Sociology", "Darjeeling Tea", "Bookstores", "Rainy Days", "Film"],
+    "likedDemoUser": true
+  },
+  {
+    "name": "Karan Oberoi",
+    "age": 24,
+    "photo": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&auto=format&fit=crop&q=80",
+    "bio": "Chef and culinary curator. Teaching people how to make fresh handmade pasta and authentic sourdough breads.",
+    "city": "Mumbai",
+    "college": "IHM Mumbai",
+    "interests": ["Culinary Arts", "Fresh Pasta", "Wine Tasting", "Jazz", "Travel"],
+    "likedDemoUser": false
+  },
+  {
+    "name": "Simran Kaur",
+    "age": 20,
+    "photo": "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&auto=format&fit=crop&q=80",
+    "bio": "Graphic designer who finds beauty in mundane street signs. Collecting printed matchboxes and quirky stickers.",
+    "city": "Chandigarh",
+    "college": "Government College of Art",
+    "interests": ["Sticker Art", "Typography", "Thrifting", "Roller Skating", "Indie Rock"],
+    "likedDemoUser": true
+  },
+  {
+    "name": "Varun Sundaram",
+    "age": 22,
+    "photo": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&auto=format&fit=crop&q=80",
+    "bio": "Aerospace enthusiast simulating rocket trajectories. Love stargazing, night drives, and south Indian filter coffee.",
+    "city": "Bengaluru",
+    "college": "IISc Bengaluru",
+    "interests": ["Aerospace", "Stargazing", "Night Drives", "South Indian Food", "Classical Music"],
+    "likedDemoUser": false
+  },
+  {
+    "name": "Ananya Kulkarni",
+    "age": 22,
+    "photo": "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=800&auto=format&fit=crop&q=80",
+    "bio": "Urban planner passionate about walkable cities and green spaces. Weekend runner and pottery student.",
+    "city": "Pune",
+    "college": "Symbiosis Pune",
+    "interests": ["Urban Planning", "Running", "Greenery", "Pottery", "Acoustic Pop"],
+    "likedDemoUser": false
+  },
+  {
+    "name": "Ishaan Grover",
+    "age": 21,
+    "photo": "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=800&auto=format&fit=crop&q=80",
+    "bio": "Math student captivated by fractals and chaos theory. I can teach you how to solve a Rubik's cube under 30 seconds.",
+    "city": "Delhi",
+    "college": "St. Stephen's College",
+    "interests": ["Mathematics", "Rubik's Cube", "Chess", "Piano", "Bouldering"],
+    "likedDemoUser": false
+  },
+  {
+    "name": "Neha Pillai",
+    "age": 23,
+    "photo": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&auto=format&fit=crop&q=80",
+    "bio": "Marine biologist researching coral reef restoration in the Andamans. Scuba instructor who loves underwater photography.",
+    "city": "Chennai",
+    "college": "Madras Christian College",
+    "interests": ["Marine Biology", "Scuba Diving", "Conservation", "Ocean", "Ukulele"],
+    "likedDemoUser": true
+  },
+  {
+    "name": "Aryan Mathur",
+    "age": 22,
+    "photo": "https://images.unsplash.com/photo-1513956589380-bad6acb9b9d4?w=800&auto=format&fit=crop&q=80",
+    "bio": "Journalism student and host of a college podcast. Always down for late-night food trucks and trivia nights.",
+    "city": "Jaipur",
+    "college": "Manipal University Jaipur",
+    "interests": ["Podcasting", "Trivia", "Food Trucks", "Rock Music", "Cinema"],
+    "likedDemoUser": false
+  }
+]
+
