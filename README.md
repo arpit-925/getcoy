@@ -1,233 +1,486 @@
-# Coy Discover
+# Coy Discover — Swipe-Based Crush Discovery
 
-> **Coy Discover** is a standalone anonymous-crush discovery application built with React, Vite, Node.js, Express, MongoDB, Tailwind CSS, and Framer Motion for the Coy SDE Intern assignment.
-> It introduces a swipe-based discovery interface where user interest is kept strictly private unless it is completely mutual.
+A standalone, mobile-first discovery experience inspired by swipe-based platforms like Tinder and Bumble, built as part of the **Coy SDE Internship Take-Home Assignment**.
 
----
+Users can discover profiles, like or pass on them, and get notified when a mutual like creates a match. The application follows Coy's core privacy principle: **a user's incoming likes are never revealed unless a mutual match occurs.**
 
-## 🎨 Design Philosophy & Brand Identity
+## Live Demo
 
-The interface avoids generic AI-generated templates, glowing gradient pills, and neon shadows in favor of a restrained, editorial dating product identity:
-- **Warm cream background**: `#FAF6F0`
-- **Near-black ink**: `#1A1715`
-- **Single muted accent**: Deep rose / warm tomato `#D6455D`
-- **Typography**: Display serif font (**Fraunces**) for wordmark, headings, and profile names, paired with **DM Sans** for legible body text.
-- **Microcopy with voice**:
-  - Pass action: *"Not this time"*
-  - Like action: *"Maybe..."*
-  - Empty state: *"Nobody left to judge. Check back soon."*
-  - Match celebration: *"You two. Finally."*
-  - Matches view: *"Mutual only. That's the whole point."*
-- **Viewports**: Crafted to fit comfortably on 390×844 mobile screens (and up) without vertical clipping or awkward scrolling.
+- **Frontend:** https://getcoy.vercel.app
+- **Backend API:** https://getcoy-backend.onrender.com
+- **GitHub Repository:** https://github.com/arpit-925/getcoy
 
----
+## Assignment Overview
 
-## 🔒 Privacy Architecture (Core Promise)
+The assignment required building a standalone Discover tab alongside a placeholder Home tab, without access to Coy's existing codebase.
 
-In Coy, an unrequited crush is never revealed to the recipient:
-1. **Server-Side Field Stripping**:
-   The `likedDemoUser` flag is defined with `select: false` in Mongoose and is stripped server-side from all `/feed` responses along with any potential aliases (`likesMe`, `likedYou`, `incomingLike`).
-2. **Neutral Feed Ordering**:
-   Unswiped profiles in `/feed` are randomized using a server-side Fisher-Yates shuffle. Position in the feed never leaks who has pre-liked you.
-3. **Identical Signals for Non-Matches**:
-   Passing and one-sided liking return the exact same HTTP 200 payload:
-   ```json
-   { "matched": false }
-   ```
-   No counts, badges, or header variations are sent for unrequited likes.
-4. **Idempotent Swipes**:
-   Repeat swipes on the same profile return the existing match status without duplicating records in MongoDB or throwing client errors.
+The implementation focuses on:
 
----
+- Displaying at least 30 seeded mock profiles.
+- Providing a one-profile-at-a-time swipe experience.
+- Supporting Like and Pass actions.
+- Detecting mutual likes and creating matches.
+- Keeping previously swiped profiles out of the feed.
+- Persisting swipes and matches across page reloads.
+- Protecting the privacy of users who have liked the demo user.
 
-## 👥 Demo Profiles & Guaranteed Mutual Matches
+## Features
 
-The database seeds **32 distinct, realistic Indian profiles** across top colleges (IITs, St. Xavier's, BITS Pilani, NIFT, LSR, COEP).
+### 1. Discover Profiles
 
-To test mutual matches during a demo, the following seeded profiles have **already liked the demo user** (`likedDemoUser: true`):
-- **Priya Sharma** (21, Architecture student, BMS College, Bengaluru)
-- **Ananya Sen** (20, Literature major, St. Xavier's College, Kolkata)
-- **Tara Iyer** (22, Neuroscience researcher, TIFR Mumbai)
-- **Meera Nambiar** (23, Classical dancer & coder, CUSAT, Kochi)
-- **Sanya Kapoor** (21, Fashion communication, NIFT Delhi)
-- **Zoya Akhtar** (22, Psychology major, Christ University, Bengaluru)
+- Browse a collection of mock user profiles.
+- Display one profile card at a time.
+- Profile information includes:
+  - Name
+  - Age
+  - Profile photo
+  - Short bio
+  - City or college
+  - Interests
+- Responsive, mobile-first interface.
 
-Liking any of these profiles immediately triggers the **"You two. Finally."** match screen and adds them to your `/matches` view. Liking any profile without a pre-existing like (e.g. *Rohan Deshmukh*, *Kabir Malhotra*, *Arjun Singhal*) records the swipe but produces no match.
+### 2. Swipe Experience
 
----
+- Swipe right to Like a profile.
+- Swipe left to Pass on a profile.
+- Drag gestures for mobile interaction.
+- Like and Pass buttons for desktop interaction.
+- Smooth card transitions and visual feedback.
+- Previously swiped profiles are excluded from subsequent feeds.
+- A clear empty state appears when no profiles remain.
 
-## ⚡ Quick Start
+### 3. Mutual Matching
 
-### Prerequisites
-- Node.js >= 18
-- MongoDB running on `127.0.0.1:27017` (or configured via `MONGO_URI` in `backend/.env`)
+A match is created only when both users have liked each other.
 
-### 1. Backend Setup
-```bash
-cd backend
-npm install
-npm run seed     # Seeds 32 profiles and resets swipes/matches
-npm test         # Runs automated unit & integration test suite
-npm start        # Starts server on http://localhost:5000
+- Liking someone who has already liked the demo user creates a mutual match.
+- An "It's a match!" experience is displayed when a mutual match is detected.
+- The Matches page displays confirmed mutual matches.
+- One-sided incoming likes are never exposed through the feed or matches API.
+
+### 4. Privacy
+
+Privacy is a core part of the application.
+
+- Incoming likes are kept secret.
+- Users only see profiles available for discovery.
+- A profile that has already been liked or passed does not appear again.
+- A match is revealed only after both users have liked each other.
+- No endpoint exposes the list of people who have liked the demo user without a mutual match.
+
+### 5. Persistent Data
+
+MongoDB Atlas is used for persistent storage.
+
+- Profile data is stored in the database.
+- Swipe actions are recorded.
+- Mutual matches are stored.
+- Previously swiped profiles remain excluded after refreshing or reopening the application.
+
+## Technology Stack
+
+### Frontend
+
+- React.js
+- Vite
+- JavaScript (ES6+)
+- React Router
+- Tailwind CSS
+- Framer Motion
+- Axios
+- Lucide React
+
+### Backend
+
+- Node.js
+- Express.js
+- JavaScript ES Modules
+- Mongoose
+- MongoDB Atlas
+- CORS
+- Morgan
+- dotenv
+
+### Deployment
+
+- Vercel — Frontend hosting
+- Render — Backend hosting
+- MongoDB Atlas — Database hosting
+
+## Application Architecture
+
+```text
+                 User
+                  |
+                  v
+          React + Vite Frontend
+                  |
+          Axios HTTP Requests
+                  |
+                  v
+          Express.js Backend
+                  |
+             API Routes
+                  |
+        +---------+---------+
+        |         |         |
+        v         v         v
+       Feed     Swipe    Matches
+        |         |         |
+        +---------+---------+
+                  |
+                  v
+             Mongoose
+                  |
+                  v
+            MongoDB Atlas
 ```
 
-### 2. Frontend Setup
-In a new terminal window:
-```bash
-cd frontend
-npm install
-npm run dev      # Starts Vite on http://localhost:5173
+## Project Structure
+
+```text
+getcoy/
+│
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   └── ...
+│   ├── vercel.json
+│   ├── package.json
+│   └── ...
+│
+├── backend/
+│   ├── config/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── scripts/
+│   │   └── seed.js
+│   ├── tests/
+│   ├── server.js
+│   └── package.json
+│
+└── README.md
 ```
 
----
+## Backend API Documentation
 
-## 📡 API Contract
+The backend exposes the following REST API endpoints.
 
-### 1. `GET /feed` (or `GET /api/feed`)
-Returns unswiped profiles for the active user, randomly shuffled, with all private like flags stripped.
+Base URL:
 
-**Response (200 OK):**
+```text
+https://getcoy-backend.onrender.com/api
+```
+
+### 1. Get Discover Feed
+
+**Endpoint:** `GET /api/feed`
+
+Returns profiles that the demo user has not previously swiped on.
+
+```http
+GET /api/feed
+```
+
+Expected behavior:
+
+- Returns available discovery profiles.
+- Excludes profiles already liked or passed.
+- Does not reveal incoming one-sided likes.
+
+### 2. Submit a Swipe
+
+**Endpoint:** `POST /api/swipe`
+
+Records a Like or Pass action.
+
+```http
+POST /api/swipe
+Content-Type: application/json
+```
+
+Example request:
+
 ```json
 {
-  "success": true,
-  "count": 32,
-  "profiles": [
-    {
-      "id": "673f...",
-      "name": "Priya Sharma",
-      "age": 21,
-      "photo": "https://images.unsplash.com/...",
-      "bio": "Architecture student obsessed with brutalist buildings...",
-      "city": "Bengaluru",
-      "college": "BMS College of Architecture",
-      "interests": ["Architecture", "Filter Coffee", "Indie Music"]
-    }
-  ]
-}
-```
-
-### 2. `POST /swipe` (or `POST /api/swipe`)
-Records a swipe action (`"like"` or `"pass"`).
-
-**Request Body:**
-```json
-{
-  "profileId": "673f...",
+  "profileId": "PROFILE_ID",
   "action": "like"
 }
 ```
 
-**Response on Mutual Match (200 OK):**
-```json
-{
-  "matched": true,
-  "match": {
-    "id": "673f...",
-    "name": "Priya Sharma",
-    "age": 21,
-    "photo": "https://images.unsplash.com/...",
-    "bio": "...",
-    "city": "Bengaluru",
-    "college": "BMS College of Architecture",
-    "interests": ["Architecture", "Filter Coffee"]
-  }
-}
+Supported actions:
+
+- `like`
+- `pass`
+
+The API records the swipe and checks whether it creates a mutual match.
+
+### 3. Get Matches
+
+**Endpoint:** `GET /api/matches`
+
+Returns confirmed mutual matches for the demo user.
+
+```http
+GET /api/matches
 ```
 
-**Response on Non-Match or Pass (200 OK):**
-```json
-{
-  "matched": false
-}
+Expected behavior:
+
+- Returns only mutual matches.
+- Does not reveal profiles that have only liked the demo user.
+
+### 4. Health Check
+
+**Endpoint:** `GET /api/health`
+
+Checks whether the backend is running.
+
+```http
+GET /api/health
 ```
 
-### 3. `GET /matches` (or `GET /api/matches`)
-Returns confirmed mutual matches only.
+## Database and Seed Data
 
-**Response (200 OK):**
-```json
-{
-  "success": true,
-  "count": 1,
-  "matches": [
-    {
-      "id": "673f...",
-      "createdAt": "2026-11-19T05:00:00.000Z",
-      "profile": {
-        "id": "673f...",
-        "name": "Priya Sharma",
-        "age": 21,
-        "photo": "https://images.unsplash.com/...",
-        "bio": "...",
-        "city": "Bengaluru",
-        "college": "BMS College of Architecture",
-        "interests": ["Architecture", "Filter Coffee"]
-      }
-    }
-  ]
-}
-```
+The project includes a seed script that populates the database with mock profiles and incoming likes for demonstration.
 
----
+Current demo dataset:
 
-## 🧪 Automated Tests
+- **32 mock profiles**
+- **13 profiles** have already liked the demo user.
+- Swipes and matches are initially reset when the seed script is executed.
 
-The test suite in `backend/tests/api.test.js` covers:
-- Pure unit tests of `backend/matching.js` (`isMutualMatch`, `sanitizeProfile`, `evaluateSwipe`)
-- Like + existing like from profile => produces mutual match
-- Like without prior like from profile => produces no match
-- Pass action => never creates a match
-- Swiped profiles => never reappear in `/feed` across reloads
-- Privacy assertion => `/feed` JSON contains no `likedDemoUser`, `likesMe`, or incoming like fields
-- Idempotency => duplicate swipes on the same profile do not corrupt or duplicate data
-- Input validation => invalid action, invalid ObjectId, or non-existent profile returns 400/404
-- Storage persistence => data persists in MongoDB across operations
+To seed the database:
 
-Run tests:
 ```bash
-cd backend && npm test
+cd backend
+npm install
+npm run seed
 ```
 
----
+**Important:** The seed script cleans existing demo data before inserting the profiles. Running it again resets existing swipes and matches.
 
-## 🛠️ Project Structure
+## Getting Started Locally
+
+### Prerequisites
+
+- Node.js
+- npm
+- MongoDB Atlas account or a MongoDB connection
+- Git
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/arpit-925/getcoy.git
+cd getcoy
+```
+
+### 2. Configure the Backend
+
+```bash
+cd backend
+npm install
+```
+
+Create a `.env` file inside the `backend` directory:
+
+```env
+PORT=5000
+NODE_ENV=development
+MONGO_URI=your_mongodb_connection_string
+CLIENT_URL=http://localhost:5173
+```
+
+Replace the MongoDB connection string with your own database URI. Do not commit your `.env` file.
+
+Start the backend:
+
+```bash
+npm run dev
+```
+
+The backend will run at:
 
 ```text
-getcoy/
-├── backend/
-│   ├── config/db.js              # MongoDB connection
-│   ├── controllers/
-│   │   ├── feedController.js     # /feed handler with shuffle & privacy filter
-│   │   ├── swipeController.js    # /swipe handler with serialized writes & idempotency
-│   │   └── matchController.js    # /matches handler
-│   ├── data/profiles.json        # 32 seeded mock profiles
-│   ├── matching.js               # Pure matching logic (unit-testable)
-│   ├── models/                   # Profile, Swipe, Match Mongoose models
-│   ├── routes/                   # Express routes with /api and direct aliases
-│   ├── scripts/seed.js           # Database reset and seeder
-│   ├── server.js                 # Express application
-│   └── tests/api.test.js         # Integration and unit tests
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── BottomNavigation.jsx  # Mobile 3-tab navigation bar
-│   │   │   ├── EmptyState.jsx        # Handcrafted empty state illustration
-│   │   │   ├── InterestTags.jsx      # Neutral outline interest chips
-│   │   │   ├── LoadingSkeleton.jsx   # Card loading placeholder
-│   │   │   ├── MatchModal.jsx        # "You two. Finally." celebration modal
-│   │   │   ├── Navbar.jsx            # Desktop top navigation
-│   │   │   ├── ProfileCard.jsx       # 3-card stack, gestures, LIKE/PASS stamps
-│   │   │   └── SwipeButtons.jsx      # "Not this time" & "Maybe..." buttons
-│   │   ├── hooks/useFeed.js          # Optimistic swipe queue & rollback
-│   │   ├── pages/
-│   │   │   ├── Discover.jsx          # Swipe discovery experience
-│   │   │   ├── Home.jsx              # Intentionally minimal placeholder
-│   │   │   └── Matches.jsx           # Responsive mutual matches grid
-│   │   ├── services/api.js           # Axios API client
-│   │   ├── App.jsx                   # Layout shell & routes
-│   │   └── index.css                 # Custom scrollbars & Tailwind base
-│   ├── index.html                    # Fraunces & DM Sans typography
-│   └── tailwind.config.js            # Coy color palette & radii
-└── README.md
+http://localhost:5000
 ```
+
+### 3. Seed the Database
+
+Open another terminal:
+
+```bash
+cd backend
+npm run seed
+```
+
+This inserts the mock profiles and prepares the initial demo state.
+
+### 4. Configure the Frontend
+
+```bash
+cd frontend
+npm install
+```
+
+Create a `.env` file inside the `frontend` directory:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+### 5. Start the Frontend
+
+```bash
+npm run dev
+```
+
+Open:
+
+```text
+http://localhost:5173
+```
+
+## Environment Variables
+
+### Backend
+
+| Variable | Description |
+|---|---|
+| `PORT` | Backend server port |
+| `NODE_ENV` | Application environment |
+| `MONGO_URI` | MongoDB connection string |
+| `CLIENT_URL` | Frontend origin for CORS configuration |
+
+### Frontend
+
+| Variable | Description |
+|---|---|
+| `VITE_API_URL` | Backend API base URL |
+
+For production, configure:
+
+```env
+VITE_API_URL=https://getcoy-backend.onrender.com/api
+```
+
+Environment variables must be configured in the respective hosting dashboards for production deployment.
+
+## Deployment
+
+### Frontend — Vercel
+
+- Import the GitHub repository.
+- Set the Root Directory to `frontend`.
+- Select Vite as the framework preset.
+- Build Command: `npm run build`
+- Output Directory: `dist`
+- Add the `VITE_API_URL` environment variable.
+- Deploy the application.
+
+The project includes `frontend/vercel.json` for SPA route handling.
+
+### Backend — Render
+
+- Connect the GitHub repository.
+- Set the Root Directory to `backend`.
+- Build Command: `npm install`
+- Start Command: `npm start`
+- Configure the required backend environment variables.
+- Deploy the service.
+
+### Database — MongoDB Atlas
+
+- Create a MongoDB Atlas database.
+- Configure database network access and credentials.
+- Set the MongoDB connection string in the Render environment variables.
+- Run the seed script to populate the demo dataset.
+
+## Testing
+
+The backend includes an API test script.
+
+Run:
+
+```bash
+cd backend
+npm test
+```
+
+The following behaviors should be verified:
+
+- Feed returns available profiles.
+- Liking a profile records the swipe.
+- Passing a profile records the swipe.
+- Previously swiped profiles do not reappear.
+- Mutual likes create matches.
+- One-sided incoming likes remain private.
+- Matches persist across page reloads.
+- The application displays an empty state when no profiles remain.
+
+## Design Decisions
+
+### Single Demo User
+
+External authentication was not required by the assignment. The application assumes a single logged-in demo user.
+
+### Mock Profiles
+
+Mock profiles are seeded into the database to make the discovery and matching experience demonstrable without requiring real user accounts.
+
+### Privacy-First Matching
+
+Incoming likes are intentionally hidden. Only mutual matches are returned to the user.
+
+### Persistent Swipe State
+
+Swipe records are stored in MongoDB rather than relying only on frontend state, ensuring that previously swiped profiles remain excluded after reloads.
+
+## Assignment Requirements Checklist
+
+| Assignment requirement | Implementation |
+|---|---|
+| Standalone application | React frontend and Express backend |
+| Placeholder Home tab | Included |
+| Discover tab | Included |
+| At least 30 mock profiles | 32 seeded profiles |
+| Profile details | Name, age, photo, bio, city/college, interests |
+| Incoming likes for demo | 13 seeded incoming likes |
+| One card at a time | Discover experience |
+| Mobile drag gestures | Swipe interaction |
+| Desktop Like/Pass buttons | Swipe controls |
+| Smooth animations | Card transitions |
+| No resurfacing swiped profiles | Backend-persisted swipe state |
+| Empty state | Included |
+| Mutual matching | Backend match detection |
+| Match confirmation | Match experience |
+| Matches view | Matches page |
+| Hide one-sided likes | Privacy-preserving API behavior |
+| GET /feed | Implemented |
+| POST /swipe | Implemented |
+| GET /matches | Implemented |
+| Persistence across reloads | MongoDB Atlas |
+
+## Limitations and Scope
+
+- This is a standalone assignment implementation, not an integration with Coy's production codebase.
+- The application assumes one demo user.
+- Profiles and incoming likes are mock data.
+- External authentication and real user registration are outside the assignment scope.
+
+## Author
+
+**Arpit Mishra**
+
+- GitHub: https://github.com/arpit-925
+- Project Repository: https://github.com/arpit-925/getcoy
+
+---
+
+Built as part of the Coy SDE Internship Take-Home Assignment.
