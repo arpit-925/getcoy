@@ -15,6 +15,11 @@ const ProfileCard = ({
   const x = useMotionValue(0);
   const controls = useAnimation();
 
+  // Reset imageError state whenever the profile changes
+  useEffect(() => {
+    setImageError(false);
+  }, [profile?._id, profile?.id, profile?.photo]);
+
   // Rotation proportional to drag x-offset (-12 deg to +12 deg)
   const rotate = useTransform(x, [-200, 0, 200], [-10, 0, 10]);
 
@@ -98,6 +103,7 @@ const ProfileCard = ({
           <img
             src={thirdProfile.photo}
             alt=""
+            referrerPolicy="no-referrer"
             className="w-full h-full object-cover filter brightness-[0.7]"
           />
         </div>
@@ -112,6 +118,7 @@ const ProfileCard = ({
           <img
             src={secondProfile.photo}
             alt=""
+            referrerPolicy="no-referrer"
             className="w-full h-full object-cover filter brightness-[0.85]"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
@@ -144,6 +151,7 @@ const ProfileCard = ({
             <img
               src={profile.photo}
               alt={profile.name}
+              referrerPolicy="no-referrer"
               onError={() => setImageError(true)}
               className="w-full h-full object-cover pointer-events-none"
               loading="eager"

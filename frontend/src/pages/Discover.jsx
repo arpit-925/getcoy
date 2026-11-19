@@ -99,6 +99,7 @@ const Discover = ({ onMatchCreated }) => {
           </div>
         ) : hasMore && currentProfile ? (
           <ProfileCard
+            key={currentProfile._id || currentProfile.id}
             profile={currentProfile}
             secondProfile={secondProfile}
             thirdProfile={thirdProfile}

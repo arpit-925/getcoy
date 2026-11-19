@@ -8,7 +8,10 @@ const MatchModal = ({ match, onClose }) => {
 
   if (!match) return null;
 
-  const matchedProfile = match.profile;
+  // Handles both { profile: { ... } } and direct profile object { name, photo, ... }
+  const matchedProfile = match.profile || match;
+
+  if (!matchedProfile || !matchedProfile.name) return null;
 
   const handleGoToMatches = () => {
     onClose();
@@ -42,6 +45,7 @@ const MatchModal = ({ match, onClose }) => {
               <img
                 src={DEMO_USER.photo}
                 alt={DEMO_USER.name}
+                referrerPolicy="no-referrer"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -51,6 +55,7 @@ const MatchModal = ({ match, onClose }) => {
               <img
                 src={matchedProfile.photo}
                 alt={matchedProfile.name}
+                referrerPolicy="no-referrer"
                 className="w-full h-full object-cover"
               />
             </div>
